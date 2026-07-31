@@ -12,7 +12,7 @@ class ChatMessageRequest(BaseModel):
     crop_name: Optional[str] = Field(default=None, description="Crop name")
     crop_filter: Optional[str] = Field(default=None, description="Crop filter")
     location: Optional[str] = Field(default=None, description="Location")
-    model: Optional[str] = Field(default="gemma2", description="LLM model name")
+    model: Optional[str] = Field(default="gemma4:e2b", description="LLM model name")
 
     def get_query(self) -> str:
         return (self.message or self.prompt or "").strip()

@@ -45,6 +45,12 @@ app.include_router(api_router)
 # Mount static directory for static files & UI assets
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR), html=True), name="static")
 
+# Mount data/uploads directory to serve uploaded images
+from app.database import DATA_DIR
+uploads_dir = DATA_DIR / "uploads"
+uploads_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/data/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
+
 
 @app.get("/", response_class=FileResponse)
 def root():

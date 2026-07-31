@@ -25,6 +25,7 @@ OFFLINE_AGRONOMIST_MESSAGE = (
 def query_gemma(
     prompt: str,
     system_prompt: Optional[str] = None,
+    images: Optional[list[str]] = None,
     model: str = DEFAULT_MODEL,
     base_url: str = OLLAMA_BASE_URL,
     timeout: float = 60.0,
@@ -43,6 +44,8 @@ def query_gemma(
     }
     if system_prompt:
         payload["system"] = system_prompt
+    if images:
+        payload["images"] = images
 
     try:
         with httpx.Client(timeout=timeout) as client:

@@ -13,6 +13,7 @@ class ChatMessageRequest(BaseModel):
     crop_filter: Optional[str] = Field(default=None, description="Crop filter")
     location: Optional[str] = Field(default=None, description="Location")
     model: Optional[str] = Field(default="gemma4:e2b", description="LLM model name")
+    image_base64: Optional[str] = Field(default=None, description="Base64 encoded image string")
 
     def get_query(self) -> str:
         return (self.message or self.prompt or "").strip()

@@ -89,7 +89,17 @@
 
             <!-- Chat Input Bar -->
             <form id="chat-form" class="chat-input-bar">
-                <input type="text" id="chat-input" class="text-input" placeholder="Uliza Mkulima Gemma swali lolote la kilimo (Ask any farming question)..." required autocomplete="off">
+                <div class="chat-input-container">
+                    <div id="image-preview-container" style="display: none;">
+                        <img id="image-preview" src="" alt="Preview">
+                        <button type="button" id="remove-image-btn" class="remove-btn">×</button>
+                    </div>
+                    <div class="input-actions">
+                        <input type="file" id="chat-image-input" accept="image/*" style="display: none;">
+                        <button type="button" id="attach-image-btn" class="btn btn-icon" title="Attach Image">📎</button>
+                        <input type="text" id="chat-input" class="text-input" placeholder="Uliza swali au pakia picha ya zao (Ask a question or upload a crop photo)..." required autocomplete="off">
+                    </div>
+                </div>
                 <button type="submit" id="chat-submit-btn" class="btn btn-primary">
                     <span>Send</span> ➔
                 </button>
@@ -269,6 +279,7 @@
     </footer>
 
     <!-- Frontend Logic Script -->
+    <script src="/static/marked.min.js"></script>
     <script src="/static/app.js"></script>
 </body>
 </html>

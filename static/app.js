@@ -86,16 +86,59 @@ function initChatUI() {
     const clearChatBtn = document.getElementById('clear-chat-btn');
     const promptChips = document.querySelectorAll('.prompt-chip');
 
+    const attachImageBtn = document.getElementById('attach-image-btn');
+    const chatImageInput = document.getElementById('chat-image-input');
+    const imagePreviewContainer = document.getElementById('image-preview-container');
+    const imagePreview = document.getElementById('image-preview');
+    const removeImageBtn = document.getElementById('remove-image-btn');
+    
+    let currentImageBase64 = null;
+
+    if (attachImageBtn && chatImageInput) {
+        attachImageBtn.addEventListener('click', () => {
+            chatImageInput.click();
+        });
+
+        chatImageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const result = e.target.result;
+                    imagePreview.src = result;
+                    imagePreviewContainer.style.display = 'block';
+                    // Extract base64 part
+                    currentImageBase64 = result.split(',')[1];
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        removeImageBtn.addEventListener('click', () => {
+            chatImageInput.value = '';
+            imagePreview.src = '';
+            imagePreviewContainer.style.display = 'none';
+            currentImageBase64 = null;
+        });
+    }
+
     if (chatForm) {
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const message = chatInput.value.trim();
             const lang = chatLanguage.value;
 
-            if (!message) return;
+            if (!message && !currentImageBase64) return;
 
             chatInput.value = '';
-            await sendChatMessage(message, lang);
+            const imageToSend = currentImageBase64;
+            
+            // Reset image input UI
+            if (chatImageInput) chatImageInput.value = '';
+            if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
+            currentImageBase64 = null;
+            
+            await sendChatMessage(message, lang, imageToSend);
         });
     }
 
@@ -135,30 +178,37 @@ function initChatUI() {
     });
 }
 
-async function sendChatMessage(promptText, language) {
+async function sendChatMessage(message, lang, imageBase64 = null) {
     const chatMessages = document.getElementById('chat-messages');
     const chatWindow = document.getElementById('chat-window');
 
     if (!chatMessages) return;
-
-    // 1. Add User Message Bubble
-    const userMsgDiv = document.createElement('div');
-    userMsgDiv.className = 'message user-message';
-    userMsgDiv.innerHTML = `
-        <div class="message-avatar">🧑‍🌾</div>
+    
+    // Add User Message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'message user-message';
+    
+    let imageHtml = '';
+    if (imageBase64) {
+        imageHtml = `<img src="data:image/jpeg;base64,${imageBase64}" class="chat-image" alt="Uploaded Image">`;
+    }
+    
+    userMsg.innerHTML = `
         <div class="message-content">
             <div class="message-header">
                 <span class="sender-name">You</span>
-                <span class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                <span class="message-time">Just now</span>
             </div>
-            <div class="message-text">${escapeHtml(promptText)}</div>
+            <div class="message-text">${escapeHtml(message)}${imageHtml}</div>
         </div>
+        <div class="message-avatar">👤</div>
     `;
-    chatMessages.appendChild(userMsgDiv);
+    chatMessages.appendChild(userMsg);
+    if (chatWindow) chatWindow.scrollTop = chatWindow.scrollHeight;
 
-    // 2. Add Thinking Bot Bubble
+    // Show typing indicator
     const botThinkingDiv = document.createElement('div');
-    botThinkingDiv.className = 'message bot-message';
+    botThinkingDiv.className = 'message bot-message typing-indicator';
     botThinkingDiv.id = 'bot-thinking-msg';
     botThinkingDiv.innerHTML = `
         <div class="message-avatar">🌱</div>
@@ -176,10 +226,14 @@ async function sendChatMessage(promptText, language) {
     // 3. API Call to /api/chat or /api/v1/chat
     try {
         const payload = {
-            message: promptText,
-            language: language || 'English',
+            message: message,
+            language: lang || 'English',
             farmer_id: 'default_farmer'
         };
+        
+        if (imageBase64) {
+            payload.image_base64 = imageBase64;
+        }
 
         const res = await apiFetch('/api/v1/chat', '/api/chat', {
             method: 'POST',
@@ -195,7 +249,15 @@ async function sendChatMessage(promptText, language) {
         const aiResponse = data.response || "Sorry, I could not generate an answer at this moment.";
 
         // Replace thinking message with real response
-        botThinkingDiv.querySelector('.message-text').innerText = aiResponse;
+        const messageTextContainer = botThinkingDiv.querySelector('.message-text');
+        
+        // Parse markdown if marked is available, otherwise fallback to plain text
+        if (typeof marked !== 'undefined') {
+            messageTextContainer.innerHTML = marked.parse(aiResponse);
+        } else {
+            messageTextContainer.innerText = aiResponse;
+        }
+        
         botThinkingDiv.querySelector('.message-time').innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         botThinkingDiv.removeAttribute('id');
 

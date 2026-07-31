@@ -316,9 +316,27 @@ body {
 }
 
 .message-text {
+    line-height: 1.5;
     font-size: 0.92rem;
-    white-space: pre-wrap;
     word-break: break-word;
+    color: var(--text-main);
+}
+
+.message-text p {
+    margin-bottom: 0.5rem;
+}
+
+.message-text p:last-child {
+    margin-bottom: 0;
+}
+
+.message-text ul, .message-text ol {
+    margin-left: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.message-text strong {
+    font-weight: 700;
 }
 
 .chat-input-bar {
@@ -793,4 +811,60 @@ body {
     font-size: 0.8rem;
     color: var(--accent-light);
     margin-top: 0.3rem;
+}
+
+/* Image Upload UI */
+.chat-input-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#image-preview-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: #f1f5f9;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    max-width: fit-content;
+}
+
+#image-preview {
+    max-height: 100px;
+    border-radius: var(--radius-sm);
+    display: block;
+}
+
+.remove-btn {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+    line-height: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-image {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: var(--radius-sm);
+    margin-top: 0.5rem;
+    display: block;
 }

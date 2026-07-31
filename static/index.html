@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mkulima Gemma — Offline AI Agronomist</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="brand">
+                <div class="brand-logo">🌾</div>
+                <div class="brand-text">
+                    <h1>Mkulima Gemma</h1>
+                    <span class="brand-sub">Offline AI Agronomist & Farm Dashboard</span>
+                </div>
+            </div>
+            
+            <div class="status-badge" id="system-status">
+                <span class="dot"></span> Offline Engine Ready
+            </div>
+
+            <nav class="nav-links">
+                <a href="#chat-section" class="nav-item active">💬 AI Chat</a>
+                <a href="#activities-section" class="nav-item">📋 Activity Logger</a>
+                <a href="#weather-section" class="nav-item">🌤️ Weather Forecast</a>
+                <a href="#extension-section" class="nav-item">📞 Extension Directory</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+
+        <!-- Banner / Notification Toast -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- Section 1: AI Agronomist Chat UI -->
+        <section id="chat-section" class="panel chat-panel">
+            <div class="panel-header">
+                <div class="header-title">
+                    <h2>🤖 AI Agronomist Assistant</h2>
+                    <p class="panel-desc">Ask questions on crop care, pest management, fertilizer application & weather advice in local dialects.</p>
+                </div>
+                <div class="chat-controls">
+                    <label for="chat-language" class="control-label">Language:</label>
+                    <select id="chat-language" class="select-input">
+                        <option value="Swahili" selected>🇰🇪 Kiswahili</option>
+                        <option value="English">🇬🇧 English</option>
+                        <option value="Kikuyu">🗣️ Gĩkũyũ</option>
+                        <option value="Luo">🗣️ Dholuo</option>
+                    </select>
+                    <button type="button" id="clear-chat-btn" class="btn btn-outline btn-sm">Clear Chat</button>
+                </div>
+            </div>
+
+            <!-- Quick Prompt Suggestions -->
+            <div class="quick-prompts">
+                <span class="prompts-label">Quick Suggestions:</span>
+                <button class="prompt-chip" data-prompt="How do I manage Fall Armyworm in my Maize crop?" data-lang="English">🌽 Fall Armyworm Control</button>
+                <button class="prompt-chip" data-prompt="Nifanye nini Mahindi yakionyesha majani ya manjano?" data-lang="Swahili">🇰🇪 Majani ya Manjano</button>
+                <button class="prompt-chip" data-prompt="When is the best time to apply CAN fertilizer?" data-lang="English">🧪 CAN Fertilizer Timing</button>
+                <button class="prompt-chip" data-prompt="Thumu ya mbembe ni iriku mega kuhanda?" data-lang="Kikuyu">🗣️ Kikuyu: Thumu ya Mbembe</button>
+                <button class="prompt-chip" data-prompt="Keto samadi gi mbolea e puothe oduma" data-lang="Luo">🗣️ Luo: Samadi e Oduma</button>
+            </div>
+
+            <!-- Chat Window -->
+            <div class="chat-window" id="chat-window">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message bot-message">
+                        <div class="message-avatar">🌱</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="sender-name">Mkulima Gemma</span>
+                                <span class="message-time">Just now</span>
+                            </div>
+                            <div class="message-text">
+                                Jambo Mkulima! Welcome to Mkulima Gemma offline AI agronomist. 
+                                How can I help with your crops, fertilizer timing, or pest control today? 
+                                You can switch languages above at any time.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input Bar -->
+            <form id="chat-form" class="chat-input-bar">
+                <input type="text" id="chat-input" class="text-input" placeholder="Uliza Mkulima Gemma swali lolote la kilimo (Ask any farming question)..." required autocomplete="off">
+                <button type="submit" id="chat-submit-btn" class="btn btn-primary">
+                    <span>Send</span> ➔
+                </button>
+            </form>
+        </section>
+
+        <!-- Section 2: Activity Logger Panel -->
+        <section id="activities-section" class="panel activity-panel">
+            <div class="panel-header">
+                <div class="header-title">
+                    <h2>📋 Activity Logger</h2>
+                    <p class="panel-desc">Record your daily farm activities, fertilizer applications, planting schedules, and harvest notes.</p>
+                </div>
+                <button type="button" id="refresh-activities-btn" class="btn btn-secondary btn-sm">🔄 Refresh List</button>
+            </div>
+
+            <div class="activities-grid">
+                <!-- Activity Entry Form -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h3>Log New Farm Activity</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="activity-form" class="grid-form">
+                            <div class="form-group">
+                                <label for="act-farmer-id">Farmer ID</label>
+                                <input type="text" id="act-farmer-id" class="text-input" value="default_farmer" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="act-type">Activity Type *</label>
+                                <select id="act-type" class="select-input" required>
+                                    <option value="PLANTING">Kupanda (Planting)</option>
+                                    <option value="FERTILIZER_APPLICATION" selected>Kuweka Mbolea (Fertilizer Application)</option>
+                                    <option value="WEEDING">Kupalilia (Weeding)</option>
+                                    <option value="PESTICIDE_SPRAY">Kupiga Dawa (Pesticide Spray)</option>
+                                    <option value="HARVESTING">Kuvuna (Harvesting)</option>
+                                    <option value="IRRIGATION">Kutilia Maai (Irrigation)</option>
+                                    <option value="OTHER">Zinginezo (Other)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="act-crop">Crop Type *</label>
+                                <input type="text" id="act-crop" class="text-input" placeholder="e.g. Maize, Tomatoes, Coffee, Beans" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="act-desc">Description *</label>
+                                <input type="text" id="act-desc" class="text-input" placeholder="e.g. Applied 50kg DAP fertilizer in Section A" required>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-6">
+                                    <label for="act-quantity">Quantity</label>
+                                    <input type="number" step="0.1" id="act-quantity" class="text-input" placeholder="e.g. 50">
+                                </div>
+                                <div class="form-group col-6">
+                                    <label for="act-unit">Unit</label>
+                                    <select id="act-unit" class="select-input">
+                                        <option value="kg" selected>kg</option>
+                                        <option value="liters">liters</option>
+                                        <option value="bags">bags</option>
+                                        <option value="acres">acres</option>
+                                        <option value="hours">hours</option>
+                                        <option value="units">units</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="act-field">Field Location</label>
+                                <input type="text" id="act-field" class="text-input" placeholder="e.g. Main Plot, Upper Hill Field">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="act-notes">Notes / Observations</label>
+                                <textarea id="act-notes" class="textarea-input" rows="2" placeholder="e.g. Soil was moist after recent rain"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-success btn-block">➕ Save Activity Log</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Logged Activities History -->
+                <div class="card history-card">
+                    <div class="card-header flex-between">
+                        <h3>Recorded Activities</h3>
+                        <div class="filter-box">
+                            <input type="text" id="activity-crop-filter" class="text-input text-input-sm" placeholder="Filter by crop...">
+                        </div>
+                    </div>
+                    <div class="card-body padding-none">
+                        <div class="table-responsive">
+                            <table class="data-table" id="activities-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Activity</th>
+                                        <th>Crop</th>
+                                        <th>Description</th>
+                                        <th>Qty</th>
+                                        <th>Location</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="activities-tbody">
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4 text-muted">Loading activities...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Weather Forecast Panel -->
+        <section id="weather-section" class="panel weather-panel">
+            <div class="panel-header">
+                <div class="header-title">
+                    <h2>🌤️ Local Weather Forecast (Cached)</h2>
+                    <p class="panel-desc">Offline weather forecasts cached locally. Click Sync to fetch latest weather updates when connected.</p>
+                </div>
+
+                <div class="weather-actions">
+                    <input type="text" id="weather-location-input" class="text-input" value="Nyeri" placeholder="Location name (e.g. Nyeri)">
+                    <button type="button" id="fetch-weather-btn" class="btn btn-secondary">🔍 View Weather</button>
+                    <button type="button" id="sync-weather-btn" class="btn btn-warning">🔄 Sync Weather</button>
+                </div>
+            </div>
+
+            <!-- Weather Grid Display -->
+            <div id="weather-cards-container" class="weather-grid">
+                <div class="loading-placeholder">Loading weather cache...</div>
+            </div>
+        </section>
+
+        <!-- Section 4: Extension Services Directory Panel -->
+        <section id="extension-section" class="panel extension-panel">
+            <div class="panel-header">
+                <div class="header-title">
+                    <h2>📞 Extension Services Directory</h2>
+                    <p class="panel-desc">Contact local agricultural officers, extension agents, agrovets, and advisory services offline.</p>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" id="extension-search-input" class="text-input" placeholder="Search by name, organization, or services...">
+                    <select id="extension-county-filter" class="select-input">
+                        <option value="">All Counties</option>
+                        <option value="Nyeri">Nyeri</option>
+                        <option value="Nakuru">Nakuru</option>
+                        <option value="Meru">Meru</option>
+                        <option value="Kiambu">Kiambu</option>
+                        <option value="Machakos">Machakos</option>
+                    </select>
+                    <button type="button" id="extension-search-btn" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+
+            <!-- Extension Contacts Grid -->
+            <div id="extension-cards-container" class="directory-grid">
+                <div class="loading-placeholder">Loading extension directory...</div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p><strong>Mkulima Gemma</strong> — Offline AI Agronomist & Farm Assistant | GDG UoN Hackathon (Track 3)</p>
+            <p class="footer-sub">Empowering Smallholder Farmers with Localized, Multilingual Agricultural Intelligence</p>
+        </div>
+    </footer>
+
+    <!-- Frontend Logic Script -->
+    <script src="/static/app.js"></script>
+</body>
+</html>

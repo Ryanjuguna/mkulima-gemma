@@ -70,7 +70,7 @@ def chat_with_agronomist(
     llm_result = query_gemma(
         prompt=full_prompt,
         system_prompt=system_prompt,
-        model=payload.model or "gemma2",
+        model=payload.model or "gemma4:e2b",
     )
 
     return ChatMessageResponse(
@@ -80,7 +80,7 @@ def chat_with_agronomist(
         farmer_id=farmer_id,
         status="success",
         context_used=context,
-        model_used=llm_result.get("model", payload.model or "gemma2"),
+        model_used=llm_result.get("model", payload.model or "gemma4:e2b"),
         augmented_prompt=full_prompt,
         is_offline=llm_result.get("is_offline", False),
     )

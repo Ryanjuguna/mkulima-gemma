@@ -21,16 +21,13 @@ OFFLINE_AGRONOMIST_MESSAGE = (
 )
 
 
-import asyncio
-import inspect
-
 
 def query_gemma(
     prompt: str,
     system_prompt: Optional[str] = None,
     model: str = DEFAULT_MODEL,
     base_url: str = OLLAMA_BASE_URL,
-    timeout: float = 30.0,
+    timeout: float = 60.0,
 ) -> Dict[str, Any]:
     """
     Sends prompt request to Ollama API POST http://localhost:11434/api/generate.
@@ -48,27 +45,12 @@ def query_gemma(
         payload["system"] = system_prompt
 
     try:
-        async_post = getattr(httpx.AsyncClient.post, "__call__", None)
-        if hasattr(httpx.AsyncClient.post, "return_value") or hasattr(httpx.AsyncClient.post, "side_effect"):
-            try:
-                res = httpx.AsyncClient.post(url, json=payload)
-            except TypeError:
-                client_inst = httpx.AsyncClient(timeout=timeout)
-                res = client_inst.post(url, json=payload)
-            if inspect.isawaitable(res):
-                response = asyncio.run(res)
-            else:
-                response = res
-        else:
-            with httpx.Client(timeout=timeout) as client:
-                response = client.post(url, json=payload)
+        with httpx.Client(timeout=timeout) as client:
+            response = client.post(url, json=payload)
 
-        if hasattr(response, "status_code") and response.status_code == 200:
+        if response.status_code == 200:
             data = response.json()
             generated_text = data.get("response", "").strip()
-            if not generated_text and "message" in data:
-                generated_text = data["message"].get("content", "").strip()
-
             return {
                 "response": generated_text or OFFLINE_AGRONOMIST_MESSAGE,
                 "model": target_model,
@@ -76,7 +58,7 @@ def query_gemma(
                 "is_offline": False,
             }
         else:
-            logger.warning(f"Ollama returned status {getattr(response, 'status_code', None)}")
+            logger.warning(f"Ollama returned status {response.status_code}: {response.text[:200]}")
             return {
                 "response": OFFLINE_AGRONOMIST_MESSAGE,
                 "model": target_model,
@@ -91,3 +73,4 @@ def query_gemma(
             "status": "offline",
             "is_offline": True,
         }
+
